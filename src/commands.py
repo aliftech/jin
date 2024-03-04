@@ -42,8 +42,8 @@ def scan_ports():
 
 
 @click.command()
-@click.argument("target", type=click.STRING)
-@click.argument("port", type=click.INT)
+@click.argument("--target", type=click.STRING)
+@click.argument("--port", type=click.INT)
 @click.option("--threads", default=100, help="Number of threads for DDoS attack")
 def attack(target, port, threads):
     rprint(

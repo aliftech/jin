@@ -3,17 +3,13 @@ from rich import print as rprint
 import src.commands as commands
 
 banner = f"""
-
-      /\__/
-     / _ \ 
-    ( (_| |
-     \___/ 
-      / _ \ 
-     ( (_| | 
-      \___/ 
-
-   Jin - Your DDOS CLI Tools 
-
+         ___   ___   __      __
+        /  /  /  /  /  \    /  /
+       /  /  /  /  /    \  /  /
+      /  /  /  /  /   \  \/  /
+  ___/  /  /  /  /  /  \    /
+ |_____/  /__/  /__/    \__/
+  
 """
 
 
