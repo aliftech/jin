@@ -2,15 +2,13 @@
 
 ```bash
 
-      /\__/
-     / _ \
-    ( (_| |
-     \___/
-      / _ \
-     ( (_| |
-      \___/
 
-   Jin - Your DDOS CLI Tools
+         ___   ___   __      __
+        /  /  /  /  /  \    /  /
+       /  /  /  /  /    \  /  /
+      /  /  /  /  /   \  \/  /
+  ___/  /  /  /  /  /  \    /
+ |_____/  /__/  /__/    \__/
 
 
 Usage: main.py [OPTIONS] COMMAND [ARGS]...
@@ -20,20 +18,27 @@ Options:
 
 Commands:
   attack
-  scan-ports
+  check
+  map
+  scan
   version
 
 ```
 
-Jin is a DDOS command-line tools designed to make your scan port and sending DDOS attack to your target. This tools is made for ethical and education purpose. I recommend you not to use this tools for harmfull action.
+Jin is a hacking command-line tools designed to make your scan port, gathering urls, check vulnerability and sending DDOS attack to your target. This tools is made for ethical and education purpose. I recommend you not to use this tools for harmfull action.
 
 ## **Current Tools:**
 
-- **scan-ports**: This tool scans a target host for open ports, providing valuable information for network analysis and troubleshooting.
+- **scan**: This tool scans a target host for open ports, providing valuable information for network analysis and troubleshooting.
 
 - **attack**: This command is used to send DDOS target to target.
 
-- **version**: This command will show the current version of this cli tool.
+- **version**: This command will show the current version of
+  this cli tool.
+
+- **map**: Mapping and gathering the related urls in the target website.
+
+- **check**: Check website vulnerability.
 
 ### **Installation:**
 
@@ -83,7 +88,7 @@ We encourage contributions from the community! If you have an idea for a new too
 
 ## **License:**
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the [Apache 2 LICENSE](LICENSE). See the LICENSE file for details.
 
 ## **Disclaimer:**
 
