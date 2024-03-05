@@ -21,6 +21,7 @@ def cli():
 cli.add_command(commands.scan_ports)
 cli.add_command(commands.attack)
 cli.add_command(commands.map)
+cli.add_command(commands.check)
 cli.add_command(commands.version)
 
 if __name__ == "__main__":
