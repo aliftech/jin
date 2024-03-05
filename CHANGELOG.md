@@ -1,3 +1,9 @@
+## 0.3.1 (2024-03-05)
+
+### Perf
+
+- separate exploit and url gathering
+
 ## 0.3.0 (2024-03-04)
 
 ### Feat
