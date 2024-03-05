@@ -18,7 +18,7 @@ def cli():
     pass
 
 
-cli.add_command(commands.scan_ports)
+cli.add_command(commands.scan)
 cli.add_command(commands.attack)
 cli.add_command(commands.map)
 cli.add_command(commands.check)

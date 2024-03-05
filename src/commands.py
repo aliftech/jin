@@ -19,12 +19,12 @@ attack_num = 0
 
 
 @click.command()
-def scan_ports():
+@click.argument("target", type=click.STRING)
+def scan(target):
     try:
-        hostname = input("Enter the website URL or IP address: ")
-        ip_address = socket.gethostbyname(hostname)
+        ip_address = socket.gethostbyname(target)
         rprint(
-            f'Scanning ports for [bold]{hostname}[/bold] ([cyan]{ip_address}[/cyan])...')
+            f'Scanning ports for [bold]{target}[/bold] ([cyan]{ip_address}[/cyan])...')
         open_ports = []
 
         for port in range(1, 1001):  # Scan ports 1 to 1000
@@ -38,6 +38,13 @@ def scan_ports():
         if not open_ports:
             rprint('[bold yellow]No open ports found.[/bold yellow]')
         else:
+            logname = f"logs/scan_{target}.log"
+            logging.basicConfig(filename=logname,
+                                filemode='a',
+                                format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                                datefmt='%H:%M:%S',
+                                level=logging.INFO)
+            logging.info(f"open ports: {open_ports}")
             rprint('[bold]Open ports:[/bold]', open_ports)
 
     except socket.gaierror:
@@ -49,8 +56,8 @@ def scan_ports():
 
 
 @click.command()
-@click.argument("--target", type=click.STRING)
-@click.argument("--port", type=click.INT)
+@click.argument("target", type=click.STRING)
+@click.argument("port", type=click.INT)
 @click.option("--threads", default=100, help="Number of threads for DDoS attack")
 def attack(target, port, threads):
     rprint(
@@ -84,7 +91,7 @@ def ddos(target: str, port: int):
 
 @click.command()
 def version():
-    rprint(f"[bold blue]version 0.0.1[/bold blue]")
+    rprint(f"[bold blue]version 0.3.2[/bold blue]")
 
 
 @click.command()
