@@ -91,7 +91,7 @@ def ddos(target: str, port: int):
 
 @click.command()
 def version():
-    rprint(f"[bold blue]version 0.3.2[/bold blue]")
+    rprint(f"[bold blue]version 0.3.3[/bold blue]")
 
 
 @click.command()
