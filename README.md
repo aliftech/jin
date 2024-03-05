@@ -1,4 +1,4 @@
-# Jin: Your DDOS CLI Toolkit
+# Jin: Your Hacking CLI Toolkit
 
 ```bash
 
