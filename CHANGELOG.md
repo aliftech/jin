@@ -1,3 +1,9 @@
+## 0.3.2 (2024-03-05)
+
+### Perf
+
+- **src/commands.py**: update port scan function
+
 ## 0.3.1 (2024-03-05)
 
 ### Perf
