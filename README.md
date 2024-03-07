@@ -82,6 +82,58 @@ python main.py <command> [options]
 
 - Replace <command> with the specific tool you want to use.
 
+## **How To Use**
+
+### **Port Scanning**
+
+The port scanning is used to scanning the open port of the targeted website. This function is called using the following command:
+
+```bash
+python main.py scan example.com
+```
+
+- The `example.com` above mean the targeted website domain.
+
+### **DDOS Attack**
+
+To launch a ddos attack to the targeted website, you can use the following command:
+
+```bash
+python main.py attack example.com 80 [option] --threads 100
+```
+
+- The `example.com` above mean the targeted website domain.
+- The `80` is the port number of targeted website. To gathering information about the opening port, you need to run the port scanning function to your targeted website.
+- `[option] --threads 100` is the optional parameter, the number of threads to use for processing.
+
+### **Mapping Related URL**
+
+This function is designed to mapping all the related urls of the target. Here is the command to call this function:
+
+```bash
+python main.py map https://www.example.com
+```
+
+- `https://www.example.com` is the targeted url.
+
+### **Vulnerability Checker**
+
+This function is used to check the vulnerability in the targeted website. Here is the command to run this function:
+
+```bash
+python main.py https://www.example.com [OPTION]
+```
+
+- The `https://www.example.com` is targeted website url.
+- The [OPTION] is the parameters used to check the targeted website vulnerability. Here are the option parameters:
+  - `--sql` Check for SQL injection vulnerability
+  - `--xss` Check for XSS vulnerability
+  - `--conf` Check for insecure configuration vulnerability
+  - `--dirtv` Check for directory traversal vulnerability
+  - `--rcev` Check for remote code execution vulnerability
+  - `--fuv` Check for file upload vulnerability
+  - `--help` Show this message and exit.
+
 ## **Contributing:**
 
 We encourage contributions from the community! If you have an idea for a new tool or want to improve existing ones, feel free to fork the repository and submit a pull request.
