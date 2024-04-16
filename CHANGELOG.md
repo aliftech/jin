@@ -1,3 +1,9 @@
+## 0.5.0 (2024-04-16)
+
+### Feat
+
+- **commands,-function,-main**: add dependencies mapping
+
 ## 0.4.0 (2024-03-08)
 
 ### Feat
