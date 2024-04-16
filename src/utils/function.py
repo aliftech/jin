@@ -51,6 +51,25 @@ def discover_urls(url):
     return discovered_urls
 
 
+def discover_dependencies(url):
+    dependencies = []
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        for scripts in soup.find_all("script"):
+            src = scripts.get("src")
+            if src:
+                dependencies.append(src)
+
+        for links in soup.find_all("link"):
+            href = links.get("href")
+            if src:
+                dependencies.append(href)
+
+    return dependencies
+
+
 def check_vulnerabilities(url, sql, xss, conf, dirtv, rcev, fuv):
     if sql:
         rprint(
