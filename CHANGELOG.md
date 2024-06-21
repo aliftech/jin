@@ -1,53 +1,23 @@
-## 0.5.0 (2024-04-16)
+## 0.1.0 (2024-06-22)
 
 ### Feat
 
 - **commands,-function,-main**: add dependencies mapping
-
-## 0.4.0 (2024-03-08)
-
-### Feat
-
 - add new function
-
-## 0.3.2 (2024-03-05)
-
-### Perf
-
-- **src/commands.py**: update port scan function
-
-## 0.3.1 (2024-03-05)
-
-### Perf
-
-- separate exploit and url gathering
-
-## 0.3.0 (2024-03-04)
-
-### Feat
-
 - add logging
-
-## 0.2.0 (2024-03-04)
-
-### Feat
-
 - add map function
-
-## 0.1.2 (2024-03-04)
-
-### Perf
-
-- update main.py
-
-## 0.1.1 (2024-02-29)
+- first commit
 
 ### Fix
 
 - fix minor issue
 
-## 0.1.0 (2024-02-29)
+### Refactor
 
-### Feat
+- **main.py,-commands.py,-function.py,-exploit.py**: remove unnecessary function and fix the core function
 
-- first commit
+### Perf
+
+- **src/commands.py**: update port scan function
+- separate exploit and url gathering
+- update main.py
