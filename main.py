@@ -21,10 +21,7 @@ def cli():
 cli.add_command(commands.scan)
 cli.add_command(commands.attack)
 cli.add_command(commands.map)
-cli.add_command(commands.check)
 cli.add_command(commands.version)
-cli.add_command(commands.sql_injection)
-cli.add_command(commands.get_dependencies)
 
 if __name__ == "__main__":
     rprint(f"[bold][red]{banner}[/red][/bold]")

