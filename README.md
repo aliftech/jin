@@ -8,14 +8,12 @@ Jin is a hacking command-line tools designed to make your scan port, gathering u
 
 - **scan**: This tool scans a target host for open ports, providing valuable information for network analysis and troubleshooting.
 
-- **attack**: This command is used to send DDOS target to target.
+- **atk**: This command is used to send DDOS target to target.
 
 - **version**: This command will show the current version of
   this cli tool.
 
 - **map**: Mapping and gathering the related urls in the target website.
-
-- **check**: Check website vulnerability.
 
 ### **Installation:**
 
