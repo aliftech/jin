@@ -1,29 +1,6 @@
 # Jin: Your Hacking CLI Toolkit
 
-```bash
-
-
-         ___   ___   __      __
-        /  /  /  /  /  \    /  /
-       /  /  /  /  /    \  /  /
-      /  /  /  /  /   \  \/  /
-  ___/  /  /  /  /  /  \    /
- |_____/  /__/  /__/    \__/
-
-
-Usage: main.py [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  attack
-  check
-  map
-  scan
-  version
-
-```
+![Screenshot_20](https://github.com/aliftech/jin/assets/47414125/3745d4ad-bb89-4e3c-b4a4-9c593d33a16d)
 
 Jin is a hacking command-line tools designed to make your scan port, gathering urls, check vulnerability and sending DDOS attack to your target. This tools is made for ethical and education purpose. I recommend you not to use this tools for harmfull action.
 
@@ -99,7 +76,7 @@ python main.py scan example.com
 To launch a ddos attack to the targeted website, you can use the following command:
 
 ```bash
-python main.py attack example.com 80 [option] --threads 100
+python main.py atk example.com -m [GET, PUT, POST] -p [payload of request] -t [number of thread (default 100)]
 ```
 
 - The `example.com` above mean the targeted website domain.
@@ -115,24 +92,6 @@ python main.py map https://www.example.com
 ```
 
 - `https://www.example.com` is the targeted url.
-
-### **Vulnerability Checker**
-
-This function is used to check the vulnerability in the targeted website. Here is the command to run this function:
-
-```bash
-python main.py https://www.example.com [OPTION]
-```
-
-- The `https://www.example.com` is targeted website url.
-- The [OPTION] is the parameters used to check the targeted website vulnerability. Here are the option parameters:
-  - `--sql` Check for SQL injection vulnerability
-  - `--xss` Check for XSS vulnerability
-  - `--conf` Check for insecure configuration vulnerability
-  - `--dirtv` Check for directory traversal vulnerability
-  - `--rcev` Check for remote code execution vulnerability
-  - `--fuv` Check for file upload vulnerability
-  - `--help` Show this message and exit.
 
 ## **Contributing:**
 
