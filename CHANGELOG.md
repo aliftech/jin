@@ -1,7 +1,3 @@
-## 0.1.0 (2024-06-22)
-
-## 0.1.0 (2024-06-22)
-
 ### Feat
 
 - **commands,-function,-main**: add dependencies mapping
