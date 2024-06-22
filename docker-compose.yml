@@ -1,0 +1,7 @@
+version: 0.1.1
+services:
+  jin:
+    build: .
+    image: jin
+    stdin_open: true
+    tty: true

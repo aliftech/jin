@@ -1,6 +1,6 @@
 # Jin: Your Hacking CLI Toolkit
 
-![Screenshot_20](https://github.com/aliftech/jin/assets/47414125/3745d4ad-bb89-4e3c-b4a4-9c593d33a16d)
+![Screenshot_21](https://github.com/aliftech/jin/assets/47414125/3842752c-18df-41b8-83d5-a7ee27597c37)
 
 Jin is a hacking command-line tools designed to make your scan port, gathering urls, check vulnerability and sending DDOS attack to your target. This tools is made for ethical and education purpose. I recommend you not to use this tools for harmfull action.
 
@@ -90,6 +90,18 @@ python main.py map https://www.example.com
 ```
 
 - `https://www.example.com` is the targeted url.
+
+## **Run JIN CLI App Using Docker**
+
+You can also running the cli app using docker by the following command:
+
+```bash
+docker compose run jin
+```
+
+Then, you will see the following result.
+
+![Screenshot_21](https://github.com/aliftech/jin/assets/47414125/3842752c-18df-41b8-83d5-a7ee27597c37)
 
 ## **Contributing:**
 
