@@ -103,6 +103,22 @@ Then, you will see the following result.
 
 ![Screenshot_21](https://github.com/aliftech/jin/assets/47414125/3842752c-18df-41b8-83d5-a7ee27597c37)
 
+## **Run JIN Through Docker Image**
+
+You can also build and run JIN using our existing docker image.
+
+- Pull our latest JIN image using the following command
+
+  ```bash
+  docker pull wahyouka/jin
+  ```
+
+- Run the JIN docker container using the following command.
+
+  ```bash
+  docker run -it wahyouka/jin:latest
+  ```
+
 ## **Contributing:**
 
 We encourage contributions from the community! If you have an idea for a new tool or want to improve existing ones, feel free to fork the repository and submit a pull request.
