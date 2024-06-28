@@ -20,6 +20,12 @@
 - separate exploit and url gathering
 - update main.py
 
+## 0.3.0 (2024-06-28)
+
+### Feat
+
+- add logging function
+
 ## 0.2.0 (2024-06-22)
 
 ### Fix
