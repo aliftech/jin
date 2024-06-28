@@ -44,6 +44,7 @@ cli.add_command(commands.scan)
 cli.add_command(commands.attack)
 cli.add_command(commands.map)
 cli.add_command(commands.version)
+cli.add_command(commands.logs)
 
 if __name__ == "__main__":
     cli()

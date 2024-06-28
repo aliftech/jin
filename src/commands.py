@@ -2,6 +2,8 @@ import click
 import socket
 import threading
 import json
+import os
+import shutil
 from rich import print as rprint
 from rich.console import Console
 import click_completion
@@ -16,7 +18,8 @@ console = Console()
 
 @click.command("scan")
 @click.argument("url", type=click.STRING)
-def scan(url):
+@click.option("-wl", type=click.STRING, help="Use to name the file where the result is saved.")
+def scan(url, wl):
     try:
         ip_address = socket.gethostbyname(url)
         rprint(
@@ -34,13 +37,22 @@ def scan(url):
         if not open_ports:
             rprint('[bold yellow]No open ports found.[/bold yellow]')
         else:
-            logname = f"logs/scan_{url}.json"
-            logging.basicConfig(filename=logname,
-                                filemode='a',
-                                format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                                datefmt='%H:%M:%S',
-                                level=logging.INFO)
-            logging.info(f"open ports: {open_ports}")
+            if wl is not None:
+                logname = f"logs/scan_{wl}.json"
+                logging.basicConfig(filename=logname,
+                                    filemode='a',
+                                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                                    datefmt='%H:%M:%S',
+                                    level=logging.INFO)
+                logging.info(f"open ports: {open_ports}")
+            else:
+                logname = f"logs/scan_{url}.json"
+                logging.basicConfig(filename=logname,
+                                    filemode='a',
+                                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                                    datefmt='%H:%M:%S',
+                                    level=logging.INFO)
+                logging.info(f"open ports: {open_ports}")
             rprint('[bold]Open ports:[/bold]', open_ports)
 
     except socket.gaierror:
@@ -87,24 +99,94 @@ def attack(url, method, payload, threads):
 
 @click.command()
 def version():
-    rprint(f"[bold blue]version 0.3.3[/bold blue]")
+    rprint(f"[bold blue]version 0.3.0[/bold blue]")
 
 
 @click.command()
 @click.argument("url", type=click.STRING)
-def map(url):
+@click.option("-wl", type=click.STRING, help="Use to name the file where the result is saved.")
+def map(url, wl):
     # Step 1: Discover URLs on the website
     parsed_url = urlparse(url)
     domain = parsed_url.netloc
     discovered_urls = discover_urls(url)
-    logname = f"logs/map_{domain}.json"
-    logging.basicConfig(filename=logname,
-                        filemode='a',
-                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                        datefmt='%H:%M:%S',
-                        level=logging.INFO)
-    logging.info(discovered_urls)
+    if wl is not None:
+        logname = f"logs/map_{wl}.json"
+        logging.basicConfig(filename=logname,
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.INFO)
+        logging.info(discovered_urls)
+    else:
+        logname = f"logs/map_{domain}.json"
+        logging.basicConfig(filename=logname,
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.INFO)
+        logging.info(discovered_urls)
     rprint(
         f"[bold cyan]Discovered {len(discovered_urls)} URLs on {url}:[/bold cyan]\n")
     for i, discovered_url in enumerate(discovered_urls, start=1):
         rprint(f"[bold green]{i}. {discovered_url}[/bold green]")
+
+
+@click.command()
+@click.option(
+    "-ls",
+    "--list",
+    type=click.Choice(["scan", "map"]),
+    help="List all the logs of scanned or mapped URL."
+)
+@click.option(
+    "-r",
+    "--read",
+    type=click.STRING,
+    help="Read the logs content."
+)
+@click.option(
+    "-rm",
+    "--remove",
+    type=click.STRING,
+    help="Remove a single or all log files."
+)
+def logs(list, read, remove):
+    if list is not None:
+        file_names = [f for f in os.listdir('logs') if os.path.isfile(os.path.join('logs', f)) and f.startswith(f'{list}_')]
+        rprint(f"[bold green]List of all {list} logs:[/bold green]")
+        rprint(f"[white]{file_names}[/white]")
+
+    if read is not None:
+        with open(f'logs/{read}', 'r') as file:
+            content = file.read()
+        rprint(f"[white]{content}[/white]")
+
+
+    if remove is not None:
+        if remove == 'all':
+            for filename in os.listdir('logs'):
+                file_path = os.path.join('logs', filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)  # Remove file or link
+
+                    rprint(f"[green bold]{filename} have been deleted[/green bold]")
+                except Exception as e:
+                    rprint(f"[red bold]Failed to delete {filename}. Reason: {e}[/red bold]")
+        else:
+            file_path = os.path.join('logs', remove)
+            if os.path.exists(file_path):  # Use os.path.exists to check existence of file/link/dir
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                        rprint(f"[green bold]{remove} has been deleted.[/green bold]")
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                        rprint(f"[green bold]Directory {remove} has been deleted.[/green bold]")
+                    else:
+                        rprint(f"[bold red]Failed to delete {remove}, Reason: unknown type.[/bold red]")
+                except Exception as e:
+                    rprint(f"[bold red]Failed to delete {remove}, Reason: {e}.[/bold red]")
+            else:
+                rprint(f"[bold red]File or directory {remove} not found.[/bold red]")
