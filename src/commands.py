@@ -91,7 +91,7 @@ def attack(url, method, payload, threads):
 
 @click.command()
 def version():
-    rprint(f"[bold blue]version 0.3.0[/bold blue]")
+    rprint(f"[bold blue]version 0.4.0[/bold blue]")
 
 
 @click.command()
