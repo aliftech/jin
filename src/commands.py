@@ -9,7 +9,7 @@ from rich.console import Console
 import click_completion
 import logging
 from urllib.parse import urlparse
-from src.utils.function import grab_banner
+from src.utils.function import *
 
 
 click_completion.init()
