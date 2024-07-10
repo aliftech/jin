@@ -10,6 +10,16 @@ import requests
 
 attack_num = 0
 
+def grab_banner(ip, port):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(1)
+            sock.connect((ip, port))
+            sock.send(b'HEAD / HTTP/1.1\r\n\r\n')
+            banner = sock.recv(1024)
+            return banner.decode().strip()
+    except Exception:
+        return "Unknown Service"
 
 def ddos(method, url, payload, headers):
     while True:

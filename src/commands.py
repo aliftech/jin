@@ -9,7 +9,8 @@ from rich.console import Console
 import click_completion
 import logging
 from urllib.parse import urlparse
-from .utils.function import *
+from src.utils.function import grab_banner
+
 
 click_completion.init()
 
@@ -19,11 +20,10 @@ console = Console()
 @click.command("scan")
 @click.argument("url", type=click.STRING)
 @click.option("-wl", type=click.STRING, help="Use to name the file where the result is saved.")
-def scan(url, wl):
+def scan(url, wl=None):
     try:
         ip_address = socket.gethostbyname(url)
-        rprint(
-            f'Scanning ports for [bold]{url}[/bold] ([cyan]{ip_address}[/cyan])...')
+        rprint(f'Scanning ports for [bold]{url}[/bold] ([cyan]{ip_address}[/cyan])...')
         open_ports = []
 
         for port in range(1, 1001):  # Scan ports 1 to 1000
@@ -32,36 +32,28 @@ def scan(url, wl):
                 result = sock.connect_ex((ip_address, port))
                 if result == 0:
                     open_ports.append(port)
-                    rprint(f'[green]Port {port}[/green] is open')
+                    service = grab_banner(ip_address, port)
+                    rprint(f'[green]Port {port}[/green] is open ({service})')
 
         if not open_ports:
             rprint('[bold yellow]No open ports found.[/bold yellow]')
         else:
-            if wl is not None:
-                logname = f"logs/scan_{wl}.json"
-                logging.basicConfig(filename=logname,
-                                    filemode='a',
-                                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                                    datefmt='%H:%M:%S',
-                                    level=logging.INFO)
-                logging.info(f"open ports: {open_ports}")
-            else:
-                logname = f"logs/scan_{url}.json"
-                logging.basicConfig(filename=logname,
-                                    filemode='a',
-                                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                                    datefmt='%H:%M:%S',
-                                    level=logging.INFO)
-                logging.info(f"open ports: {open_ports}")
+            logname = f"logs/scan_{wl or url}.json"
+            logging.basicConfig(
+                filename=logname,
+                filemode='a',
+                format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                datefmt='%H:%M:%S',
+                level=logging.INFO
+            )
+            logging.info(f"open ports: {open_ports}")
             rprint('[bold]Open ports:[/bold]', open_ports)
 
     except socket.gaierror:
-        rprint(
-            '[bold red]Hostname could not be resolved. Please enter a valid hostname.[/bold red]')
+        rprint('[bold red]Hostname could not be resolved. Please enter a valid hostname.[/bold red]')
     except socket.error as e:
         rprint('[bold red]Could not connect to server.[/bold red]')
         rprint(f'[italic red]{e}[/italic red]')
-
 
 @click.command("atk")
 @click.argument("url", type=click.STRING)
