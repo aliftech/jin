@@ -20,6 +20,12 @@
 - separate exploit and url gathering
 - update main.py
 
+## 0.3.1 (2024-07-10)
+
+### Perf
+
+- improve scan function
+
 ## 0.3.0 (2024-06-28)
 
 ### Feat
