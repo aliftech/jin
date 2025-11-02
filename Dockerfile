@@ -1,35 +1,38 @@
+# Declare ARG BEFORE any FROM that uses it
+ARG BASE_IMAGE=alpine:latest
+
 # Build stage
-FROM golang:1.25-rc AS builder
+FROM golang:1.24.4-alpine AS builder
 
-# Set working directory
 WORKDIR /app
-
-# Copy all files and directories from the build context
-COPY . .
-
-# Download dependencies
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Build the binary with CGO disabled for static linking
-RUN CGO_ENABLED=0 GOOS=linux go build -o serverinfo main.go
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o jin ./cmd/
 
-# Runtime stage
-FROM alpine:latest
+# Final stage — uses the ARG declared at top
+FROM ${BASE_IMAGE}
 
-# Install ca-certificates for HTTPS requests
-RUN apk --no-cache add ca-certificates
+# Install ca-certificates and tzdata
+RUN if command -v apt-get >/dev/null 2>&1; then \
+    apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates tzdata && \
+    rm -rf /var/lib/apt/lists/*; \
+    elif command -v apk >/dev/null 2>&1; then \
+    apk add --no-cache ca-certificates tzdata; \
+    fi
 
-# Set working directory
-WORKDIR /root/
+# # Create non-root user
+# RUN if command -v adduser >/dev/null 2>&1; then \
+#     adduser -D -s /bin/sh jinuser; \
+#     elif command -v useradd >/dev/null 2>&1; then \
+#     useradd -m -s /bin/sh jinuser; \
+#     fi
 
-# Copy the binary from the build stage
-COPY --from=builder /app/serverinfo .
+# Copy binary
+COPY --from=builder /app/jin /usr/local/bin/jin
 
-# Ensure the binary is executable
-RUN chmod +x ./serverinfo
-
-# Set entrypoint to the binary
-ENTRYPOINT ["./serverinfo"]
-
-# Default command (optional, can be overridden by user)
-CMD ["help"]
+# USER jinuser
+ENTRYPOINT ["jin"]
+CMD ["--help"]

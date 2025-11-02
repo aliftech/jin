@@ -4,6 +4,10 @@ docker build -t jin .
 ```
 
 ```bash
+docker build -f Dockerfile.bookworm -t wahyouka/jin:v2.0.0-bookworm .
+```
+
+```bash
 docker run -it jin help
 docker run -it jin https://example.com/
 docker run -it jin dns -t https://example.com/
